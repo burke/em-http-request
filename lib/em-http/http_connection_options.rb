@@ -6,7 +6,6 @@ class HttpConnectionOptions
     @connect_timeout     = options[:connect_timeout] || 5        # default connection setup timeout
     @inactivity_timeout  = options[:inactivity_timeout] ||= 10   # default connection inactivity (post-setup) timeout
 
-    @tls   = options[:tls] || options[:ssl] || {}
     @proxy = options[:proxy]
 
     if bind = options[:bind]
@@ -16,6 +15,8 @@ class HttpConnectionOptions
 
     uri = uri.kind_of?(Addressable::URI) ? uri : Addressable::URI::parse(uri.to_s)
     uri.port = (uri.scheme == "https" ? (uri.port || 443) : (uri.port || 80))
+
+    @tls = {:verify_peer => true, :hostname => uri.host}.merge(options[:tls] || options[:ssl] || {})
 
     if proxy = options[:proxy]
       @host = proxy[:host]
